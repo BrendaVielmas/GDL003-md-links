@@ -1,35 +1,67 @@
 
 let fs = require("fs");
+let path = require("path");
 //Es directorio
-const itsDirectory = (path) => {
-	let resultOfDirectory = fs.lstatSync('./README.md').isDirectory()
-
-	return resultOfDirectory;
-	
+const itsDirectory = (filePath) => {
+	let resultOfDirectory = fs.lstatSync(filePath).isDirectory()
+	return resultOfDirectory;	
 };
-console.log(itsDirectory());
+
+//console.log(itsDirectory('./README.md'));
 
 //Es archivo
-const itsFile = (path) => {
-	let resultOfFile = fs.lstatSync('./README.md').isFile()
-
-	
-	console.log(itsFile());
-	if (resultOfFile == true) {
-		//Leer archivos
-		exports.mdLinks = (path, opts) => {
-	
-			fs.readFile('./README.md', (err, data) => {
-				if (err) throw err;
-				console.log(data.toString())
-			});
-		}
-		exports.mdLinks()
-		return resultOfFile;
-	} 
-	
+const itsFile = (filePath) => {
+	let resultOfFile = fs.lstatSync(filePath).isFile()
+	return resultOfFile;
 };
 
+//console.log(itsFile('./README.md'));
+
+//Leer directorio
+const readDirectory = (filePath) => {
+	let listOfFiles = fs.readdirSync(filePath)
+	return listOfFiles;
+};
+
+//console.log(readDirectory('./'));
+
+//Leer archivo
+const readFile = (filePath) => {
+	let showFile = fs.readFileSync(filePath)
+	return showFile.toString();
+};
+
+//console.log(readFile('./README.md'));
+
+//Ver si es .md
+const itsMdFile = (filePath) => {
+	if (path.extname(filePath) === ".md") {
+		return true;
+	}
+	return false;
+};
+
+//console.log(itsMdFile('./README.md'));
+
+//Leer archivo MD
+const readMdFile = (filePath) => {
+	if (itsMdFile(filePath)) {
+		return readFile(filePath);
+	}else {
+		return "";
+	}
+}
+
+//console.log(readMdFile('./README.md'));
+
+//encontrar link
+const findLinks = (fileContent) => {
+	let linkRegExp = /\[.+\]\(.+\)/gim;
+	let links = fileContent.match(linkRegExp);
+	return links;
+}
+
+console.log(findLinks(readMdFile('./README.md')));
 
 /*Problema W: enseñar links validados
 Para resolver W necesito X: validar links
@@ -39,13 +71,13 @@ Para resolver Z necesito A: filtrar archivos md.
 Para resolver A necesito B: leer directorio.
 Para resolver B necesito C: que sepa si es archivo o directorio.*/
 
-module.exports = (filePath) => {
+/*module.exports = (filePath) => {
 	if (path.extname(filePath) === ".md") {
 		return true;
 	}
 	return false;
 };
-
+*/
 
 // return path.extname(filePath) === ".md" ? true : false;
 
