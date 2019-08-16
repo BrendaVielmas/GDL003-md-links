@@ -1,6 +1,7 @@
 
 let fs = require("fs");
 let path = require("path");
+
 //Es directorio
 const itsDirectory = (filePath) => {
 	let resultOfDirectory = fs.lstatSync(filePath).isDirectory()
@@ -56,12 +57,33 @@ const readMdFile = (filePath) => {
 
 //encontrar link
 const findLinks = (fileContent) => {
-	let linkRegExp = /\[.+\]\(.+\)/gim;
-	let links = fileContent.match(linkRegExp);
+	//let linkRegExp = /\(.+\)/gim;
+	
+	let linkRegExp = /\((\http(s)?:.+)\)/gim;
+	let links = [];
+	let result;
+	while(result =linkRegExp.exec(fileContent)) {
+		links.push(result[1])
+	}
+
 	return links;
 }
 
 console.log(findLinks(readMdFile('./README.md')));
+
+//borrar parentesis de links
+const replaceSimbol = (findLinks) => {
+//	let replace = 
+};
+
+//encontrar nombre de link
+const nameLinks = (fileContent) => {
+	let linkNameRegExp = /\[.+\]/gim;
+	let linksName = fileContent.match(linkNameRegExp);
+	return linksName;
+}
+
+//console.log(nameLinks(readMdFile('./README.md')));
 
 /*Problema W: enseñar links validados
 Para resolver W necesito X: validar links
@@ -78,11 +100,9 @@ Para resolver B necesito C: que sepa si es archivo o directorio.*/
 	return false;
 };
 */
-
 // return path.extname(filePath) === ".md" ? true : false;
-
 //module.exports =(filePath) => path.extname(filepath) === ".md" ? true : false;
-
 //module.exports = filePath => path.extname(filepath) === ".md" ? true : false;
-
 //module.exports = filePath => path.extname(filepath) === ".md";
+
+
