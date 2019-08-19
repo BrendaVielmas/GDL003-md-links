@@ -1,6 +1,13 @@
 
 let fs = require("fs");
 let path = require("path");
+let jsdom = require("jsdom");
+const { JSDOM } = jsdom;
+const { window } = new JSDOM();
+const { document } = (new JSDOM('')).window;
+global.document = document;
+
+let $ = jQuery = require('jquery')(window);
 
 //Es directorio
 const itsDirectory = (filePath) => {
@@ -57,7 +64,8 @@ const readMdFile = (filePath) => {
 
 //encontrar links con nombre
 const findLinksData = (fileContent) => {
-	let linkRegExp = /\[(.*)\]\((.*)\)/gim; 
+	let linkRegExp = /\[(\S+)\]\((\S+)\)/gim; 
+	//let linkRegExp = /https?:\S+\w/gim;
 	let matches = fileContent.matchAll(linkRegExp);
 	let links = Array.from(matches, match => { 
 		return {"name": match[1], "link": match[2]}
@@ -65,17 +73,35 @@ const findLinksData = (fileContent) => {
 	return links;
 }
 
-console.log(findLinksData(readMdFile('./README.md')));
+//console.log(findLinksData(readMdFile('./README.md')));
+
+//validar link
+function  UrlExists(url, cb){
+    jQuery.ajax({
+        url:      url,
+        dataType: 'text',
+        type:     'GET',
+        complete:  function(xhr){
+            if(typeof cb === 'function')
+               cb.apply(this, [xhr.status]);
+        }
+    });
+}
+
+UrlExists("http://googyyyyyyyyyyyyyyyyyle.com" , function(status){
+    if(status === 200){
+       console.log("file was found");
+    } else if(status === 404){
+	console.log("404 not found");
+	}
+});
+
+
 
 
 //encontrar nombre de link
-const nameLinks = (fileContent) => {
-	let matches = fileContent.matchAll(linkRegExp);
-	let links = Array.from(matches, match => match[1]);
-	return linksName;
-}
-
-//console.log(nameLinks(readMdFile('./README.md')));
+//const nameLinks = findLinksData(links);
+//console.log(links[0].links);
 
 /*Problema W: enseñar links validados
 Para resolver W necesito X: validar links
