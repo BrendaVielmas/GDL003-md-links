@@ -55,31 +55,23 @@ const readMdFile = (filePath) => {
 
 //console.log(readMdFile('./README.md'));
 
-//encontrar link
-const findLinks = (fileContent) => {
-	//let linkRegExp = /\(.+\)/gim;
-	
-	let linkRegExp = /\((\http(s)?:.+)\)/gim;
-	let links = [];
-	let result;
-	while(result =linkRegExp.exec(fileContent)) {
-		links.push(result[1])
-	}
-
+//encontrar links con nombre
+const findLinksData = (fileContent) => {
+	let linkRegExp = /\[(.*)\]\((.*)\)/gim; 
+	let matches = fileContent.matchAll(linkRegExp);
+	let links = Array.from(matches, match => { 
+		return {"name": match[1], "link": match[2]}
+	});
 	return links;
 }
 
-console.log(findLinks(readMdFile('./README.md')));
+console.log(findLinksData(readMdFile('./README.md')));
 
-//borrar parentesis de links
-const replaceSimbol = (findLinks) => {
-//	let replace = 
-};
 
 //encontrar nombre de link
 const nameLinks = (fileContent) => {
-	let linkNameRegExp = /\[.+\]/gim;
-	let linksName = fileContent.match(linkNameRegExp);
+	let matches = fileContent.matchAll(linkRegExp);
+	let links = Array.from(matches, match => match[1]);
 	return linksName;
 }
 
