@@ -1,13 +1,8 @@
 
 let fs = require("fs");
 let path = require("path");
-let jsdom = require("jsdom");
-const { JSDOM } = jsdom;
-const { window } = new JSDOM();
-const { document } = (new JSDOM('')).window;
-global.document = document;
 
-let $ = jQuery = require('jquery')(window);
+var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
 //Es directorio
 const itsDirectory = (filePath) => {
@@ -75,33 +70,47 @@ const findLinksData = (fileContent) => {
 
 //console.log(findLinksData(readMdFile('./README.md')));
 
+const links = () => { 
+	let linkArray = findLinksData(readMdFile('./README.md'));
+	for (let i = 0; i < linkArray.length; i++) {
+		console.log(linkArray[i].link);
+	};
+	return linkArray;
+};
+
+console.log(links())
+
+/*const saveLinks = () => {
+	let save = links();
+	for (let i = 0; i < save.length; i++) {
+		console.log(save[i].link);
+	};
+	return save;
+};
+
+console.log(saveLinks())*/
+
 //validar link
-function  UrlExists(url, cb){
-    jQuery.ajax({
-        url:      url,
-        dataType: 'text',
-        type:     'GET',
-        complete:  function(xhr){
-            if(typeof cb === 'function')
-               cb.apply(this, [xhr.status]);
-        }
-    });
+const linkOk = (url, status) => {
+	console.log(url + " was found, status" + status);
 }
+const linkNotOk = (url, status) => {
+	console.log(url + " was not found, status" + status);
+}
+const test = (url) => {
+	let xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = () => {
+		if (xhttp.readyState == 4 && xhttp.status == 200) {
+			linkOk(url, xhttp.status);
+		} else if (xhttp.readyState == 4 && xhttp.status != 200) {
+			linkNotOk(url, xhttp.status);
+		}
+    };
+    xhttp.open("GET", url, true);
+    xhttp.send();
+}
+//test(saveLinks());
 
-UrlExists("http://googyyyyyyyyyyyyyyyyyle.com" , function(status){
-    if(status === 200){
-       console.log("file was found");
-    } else if(status === 404){
-	console.log("404 not found");
-	}
-});
-
-
-
-
-//encontrar nombre de link
-//const nameLinks = findLinksData(links);
-//console.log(links[0].links);
 
 /*Problema W: enseñar links validados
 Para resolver W necesito X: validar links
@@ -114,13 +123,10 @@ Para resolver B necesito C: que sepa si es archivo o directorio.*/
 /*module.exports = (filePath) => {
 	if (path.extname(filePath) === ".md") {
 		return true;
-	}
-	return false;
+	}return false;
 };
 */
 // return path.extname(filePath) === ".md" ? true : false;
 //module.exports =(filePath) => path.extname(filepath) === ".md" ? true : false;
 //module.exports = filePath => path.extname(filepath) === ".md" ? true : false;
 //module.exports = filePath => path.extname(filepath) === ".md";
-
-
