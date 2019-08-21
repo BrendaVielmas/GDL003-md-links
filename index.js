@@ -58,16 +58,15 @@ const readMdFile = (filePath) => {
 //encontrar links con nombre
 const findLinksData = (fileContent) => {
 	let linkRegExp = /\[(\S+)\]\((\S+)\)/gim; 
-	//let linkRegExp = /https?:\S+\w/gim;
 	let matches = fileContent.matchAll(linkRegExp);
 	let links = Array.from(matches, match => { 
-		return {"name": match[1], "link": match[2]}
+	//	return {"name": match[1], "link": match[2]}
+		return match[2];
 	});
 	return links;
 }
 
 //console.log(findLinksData(readMdFile('./README.md')));
-
 
 //validar link
 const test = (url) => {
@@ -77,15 +76,12 @@ const test = (url) => {
    	});
 };
   
-// test("https://nodejs.org/es/").then((status) => {console.log(status)})
+ test("https://nodejs.org/es/about/").then((status) => {console.log(status)})
 
-//Imprimir links validados
 
 // Caso 1 .- Ruta relativa sin options
-const mdLinks = () => {
-	 
+/*const mdLinks = () => {
 };
-
 mdLinks("./some/example.md")
   .then(links => {
     // => [{ href, text, file }]
@@ -93,7 +89,6 @@ mdLinks("./some/example.md")
     console.log(links)
   })
   .catch(console.error);
-
 // Caso  .- Ruta relativa con option (validate)
 mdLinks("./some/example.md", { validate: true })
   .then(links => {
@@ -110,7 +105,7 @@ mdLinks("./some/dir")
     console.log("dir")
     console.log(links)
   })
-  .catch(console.error);
+  .catch(console.error); */
 /*Problema W: enseñar links validados
 Para resolver W necesito X: validar links
 Para resolver X necesito Y: encontrar links
