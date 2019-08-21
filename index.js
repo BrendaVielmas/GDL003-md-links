@@ -1,9 +1,7 @@
 
 let fs = require("fs");
 let path = require("path");
-
-var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
-
+const fetch = require("node-fetch");
 //Es directorio
 const itsDirectory = (filePath) => {
 	let resultOfDirectory = fs.lstatSync(filePath).isDirectory()
@@ -70,48 +68,49 @@ const findLinksData = (fileContent) => {
 
 //console.log(findLinksData(readMdFile('./README.md')));
 
-const links = () => { 
-	let linkArray = findLinksData(readMdFile('./README.md'));
-	for (let i = 0; i < linkArray.length; i++) {
-		console.log(linkArray[i].link);
-	};
-	return linkArray;
-};
-
-console.log(links())
-
-/*const saveLinks = () => {
-	let save = links();
-	for (let i = 0; i < save.length; i++) {
-		console.log(save[i].link);
-	};
-	return save;
-};
-
-console.log(saveLinks())*/
 
 //validar link
-const linkOk = (url, status) => {
-	console.log(url + " was found, status" + status);
-}
-const linkNotOk = (url, status) => {
-	console.log(url + " was not found, status" + status);
-}
 const test = (url) => {
-	let xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = () => {
-		if (xhttp.readyState == 4 && xhttp.status == 200) {
-			linkOk(url, xhttp.status);
-		} else if (xhttp.readyState == 4 && xhttp.status != 200) {
-			linkNotOk(url, xhttp.status);
-		}
-    };
-    xhttp.open("GET", url, true);
-    xhttp.send();
-}
-//test(saveLinks());
+	return fetch(url)
+   	.then((res) => {
+   		return res.status
+   	});
+};
+  
+// test("https://nodejs.org/es/").then((status) => {console.log(status)})
 
+//Imprimir links validados
 
+// Caso 1 .- Ruta relativa sin options
+const mdLinks = () => {
+	 
+};
+
+mdLinks("./some/example.md")
+  .then(links => {
+    // => [{ href, text, file }]
+    console.log("basico")
+    console.log(links)
+  })
+  .catch(console.error);
+
+// Caso  .- Ruta relativa con option (validate)
+mdLinks("./some/example.md", { validate: true })
+  .then(links => {
+    // => [{ href, text, file, status, ok }]
+    console.log("validate true")
+    console.log(links)
+  })
+  .catch(console.error);
+
+// Caso 3 .- Ruta relativa de un directorio sin options
+mdLinks("./some/dir")
+  .then(links => {
+    // => [{ href, text, file }]
+    console.log("dir")
+    console.log(links)
+  })
+  .catch(console.error);
 /*Problema W: enseñar links validados
 Para resolver W necesito X: validar links
 Para resolver X necesito Y: encontrar links
