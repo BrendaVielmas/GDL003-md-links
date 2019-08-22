@@ -1,5 +1,6 @@
 
 let fs = require("fs");
+let fsPromises = require("fs").promises;
 let path = require("path");
 const fetch = require("node-fetch");
 //Es directorio
@@ -28,18 +29,19 @@ const readDirectory = (filePath) => {
 
 //Leer archivo
 const readFile = (filePath) => {
-	let showFile = fs.readFileSync(filePath)
-	return showFile.toString();
+	return fs.readFileSync(filePath).toString();
 };
-
+const readFilePromise = (filePath) => {
+	return fsPromises.readFile(filePath)
+	.then ((content) => {
+		return content.toString()
+	});
+};
 //console.log(readFile('./README.md'));
 
 //Ver si es .md
 const itsMdFile = (filePath) => {
-	if (path.extname(filePath) === ".md") {
-		return true;
-	}
-	return false;
+	return path.extname(filePath) === ".md";
 };
 
 //console.log(itsMdFile('./README.md'));
@@ -47,7 +49,7 @@ const itsMdFile = (filePath) => {
 //Leer archivo MD
 const readMdFile = (filePath) => {
 	if (itsMdFile(filePath)) {
-		return readFile(filePath);
+		return readFilePromise(filePath);
 	}else {
 		return "";
 	}
@@ -57,7 +59,7 @@ const readMdFile = (filePath) => {
 
 //encontrar links con nombre
 const findLinksData = (fileContent) => {
-	let linkRegExp = /\[(\S+)\]\((\S+)\)/gim; 
+	let linkRegExp = /\[(.+)\]\((\S+)\)/gim; 
 	let matches = fileContent.matchAll(linkRegExp);
 	let links = Array.from(matches, match => { 
 	//	return {"name": match[1], "link": match[2]}
@@ -68,20 +70,54 @@ const findLinksData = (fileContent) => {
 
 //console.log(findLinksData(readMdFile('./README.md')));
 
-//validar link
-const test = (url) => {
-	return fetch(url)
-   	.then((res) => {
-   		return res.status
-   	});
-};
-  
- test("https://nodejs.org/es/about/").then((status) => {console.log(status)})
-
 
 // Caso 1 .- Ruta relativa sin options
-/*const mdLinks = () => {
+const mdLinks = (filePath, options) => {
+		if (itsDirectory(filePath)) {
+			return readDirectory(filePath)
+			.then((filePath) => {
+				return readMdFile(filePath)
+				.then((fileContent) => {
+					return findLinksData(fileContent)
+				})
+				.then((links) => {
+					let arrObj = [];
+				links.forEach((url) => {
+					arrObj.push({"href" : url})
+				})
+				return arrObj;
+			})
+		});
+		} else if (itsFile(filePath)) {
+			return readMdFile(filePath)
+			.then((fileContent) => {
+				return findLinksData(fileContent)
+			})
+			.then((links) => {
+				let arrObj = [];
+				links.forEach((url) => {
+					arrObj.push({"href" : url})
+				})
+				return arrObj;
+			})
+		}
 };
+
+mdLinks('./README.md');
+
+/*links.forEach((url) => {
+	})
+fetch(url)
+   		.then((res) => {
+   			return res.status
+   		})
+   		.then((status) => {
+   			return [url, status];
+  	 	})
+  	 	.then((arr) =>{
+  	 		console.log(arr[0]+ " " + arr[1]);
+  	 	})*/
+/*
 mdLinks("./some/example.md")
   .then(links => {
     // => [{ href, text, file }]
