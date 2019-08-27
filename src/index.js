@@ -1,10 +1,14 @@
 
 
 let fs = require("fs");
+//let fetchSync = require('fetch-sync')
 let fsPromises = require("fs").promises;
 let path = require("path");
 const fetch = require("node-fetch");
+
+
 window.index = {
+
 //Es directorio
 itsDirectory : (filePath) => {
 	let resultOfDirectory = fs.lstatSync(filePath).isDirectory()
@@ -101,30 +105,25 @@ mdLinks : (filePath, options) => {
 				arrObj.push({"href" : url})
 			})
 			return arrObj;
-		})/*
-		.then 
-			if (options === true) {
-				fetch(url)
-		   		.then((res) => {
-		   			return res.status
-		   		})
-		   		.then((status) => {
-		   			return [url, status];
-		  	 	})
-		  	 	.then((arr) =>{
-		  	 		console.log(arr[0]+ " " + arr[1]);
-		  	 	})
-			}*/
-		};
+		})
+		.then ((url) => { 
+			fetch(url)
+		   	.then((res) => {
+		   		return res.status
+		   	})
+			.then((status) => {
+		   		return [url, status];
+		  	})
+		   	.then((arr) =>{
+		   		console.log(arr[0]+ " " + arr[1]);
+		 	})
+		}) 
+	};
 },
-//mdLinks('./README.md')
+//dLinks('./README.md')
 //.then((links)=>{
 //	console.log(links);
 //});
-
-
-
-
 }
 /*links.forEach((url) => {
 	})
@@ -170,14 +169,3 @@ Para resolver Y necesito Z: leer un archivo md.
 Para resolver Z necesito A: filtrar archivos md.
 Para resolver A necesito B: leer directorio.
 Para resolver B necesito C: que sepa si es archivo o directorio.*/
-
-/*module.exports = (filePath) => {
-	if (path.extname(filePath) === ".md") {
-		return true;
-	}return false;
-};
-*/
-// return path.extname(filePath) === ".md" ? true : false;
-//module.exports =(filePath) => path.extname(filepath) === ".md" ? true : false;
-//module.exports = filePath => path.extname(filepath) === ".md" ? true : false;
-//module.exports = filePath => path.extname(filepath) === ".md";
