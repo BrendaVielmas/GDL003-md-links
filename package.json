@@ -4,13 +4,15 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "test": "jest --coverage"
+    "jest": "jest --env=node --colors --coverage test",
+    "test": "npm run jest"
   },
   "dependencies": {
     "eslint": "^5.9.0",
     "eslint-plugin-jest": "^22.1.2",
     "fetch-sync": "^2.0.0",
     "jest": "^23.6.0",
+    "match-all": "^1.2.5",
     "node-fetch": "^2.6.0"
   }
 }

@@ -1,36 +1,43 @@
-require("../src/index.js");
+require('../index.js');
 
+describe('index', () => {
+
+  it('debería ser un objeto', () => {
+    expect(typeof index).toEqual('object');
+  });
+});
+/*
 describe("itsDirectory", () => {
   it("is a function", () => {
-    expect (typeof index.itsDirectory).toBe("function");
+    expect(typeof itsDirectory).toBe("function");
   });
   it("it should be return if its directory or not", () => {
   	let filePath = "./README.md";
-    expect(index.itsDirectory(filePath)).toBe(false);
+    expect(itsDirectory(filePath)).toBe(false);
   });
 });
 
 describe("itsFile", () => {
   it("is a function", () => {
-    expect (typeof index.itsFile).toBe("function");
+    expect (typeof itsFile).toBe("function");
   });
   it("it should be return if its file or not", () => {
   	let filePath = "./README.md";
-    expect(index.itsFile(filePath)).toBe(true);
+    expect(itsFile(filePath)).toBe(true);
   });
 });
 
 describe("readDirectory", () => {
   it("is a function", () => {
-    expect (typeof index.readDirectory).toBe("function");
+    expect (typeof readDirectory).toBe("function");
   });
   it("it should be return a list of files", () => {
   	let filePath = "./";
-    expect(index.readDirectory(filePath)).toEqual([".editorconfig", ".eslintrc", ".git", ".gitignore", ".prettierrc", "coverage", "index.js", "node_modules", "package-lock.json", "package.json", "README.md", "src", "test"]);
+    expect(readDirectory(filePath)).toEqual([".editorconfig", ".eslintrc", ".git", ".gitignore", ".prettierrc", "coverage", "index.js", "node_modules", "package-lock.json", "package.json", "README.md", "src", "test"]);
   });
 });
 
-/*describe("readFilePromise", () => {
+describe("readFilePromise", () => {
   it("is a function", () => {
     expect (typeof index.readFilePromise).toBe("function");
   });
@@ -38,24 +45,25 @@ describe("readDirectory", () => {
   	let filePath = "./README.md";
     expect(index.readFilePromise(filePath)).toBe();
   });
-});*/
+});
 
 describe("itsMdFile", () => {
   it("is a function", () => {
-    expect (typeof index.itsMdFile).toBe("function");
+    expect (typeof itsMdFile).toBe("function");
   });
   it("it should be return if its Md file or not", () => {
   	let filePath = "./README.md";
-    expect(index.itsMdFile(filePath)).toBe(true);
+    expect(itsMdFile(filePath)).toBe(true);
   });
 });
 
 describe("findLinksData", () => {
   it("is a function", () => {
-    expect (typeof index.findLinksData).toBe("function");
+    expect (typeof findLinksData).toBe("function");
   });
   it("it should be return the links of data", () => {
   	let fileContent = "./README.md";
-    expect(index.findLinksData(fileContent)).toEqual([]);
+    expect(findLinksData(fileContent)).toEqual([]);
   });
 });
+*/

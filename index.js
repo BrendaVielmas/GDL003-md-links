@@ -1,80 +1,77 @@
-
-
-let fs = require("fs");
-let fsPromises = require("fs").promises;
-let path = require("path");
+const fs = require("fs");
+const fsPromises = require("fs").promises;
+const path = require("path");
 const fetch = require("node-fetch");
-window.index = {
+const matchAll = require("match-all");
 //Es directorio
-itsDirectory : (filePath) => {
+const itsDirectory = (filePath) => {
 	let resultOfDirectory = fs.lstatSync(filePath).isDirectory()
 	return resultOfDirectory;	
-},
+};
 
 //console.log(itsDirectory('./README.md'));
 
 //Es archivo
-itsFile : (filePath) => {
+const itsFile = (filePath) => {
 	let resultOfFile = fs.lstatSync(filePath).isFile()
 	return resultOfFile;
-},
+};
 
 //console.log(itsFile('./README.md'));
 
 //Leer directorio
-readDirectory : (filePath) => {
+const readDirectory = (filePath) => {
 	let listOfFiles = fs.readdirSync(filePath)
 	return listOfFiles;
-},
+};
 
 //console.log(readDirectory('./'));
 
 //Leer archivo
-readFile : (filePath) => {
+const readFile = (filePath) => {
 	return fs.readFileSync(filePath).toString();
-},
+};
 
-readFilePromise : (filePath) => {
+const readFilePromise = (filePath) => {
 	return fsPromises.readFile(filePath)
 	.then ((content) => {
 		return content.toString()
 	});
-},
-//console.log(readFile('./README.md'));
+};
+//console.log(readFilePromise('./README.md'));
 
 //Ver si es .md
-itsMdFile : (filePath) => {
+const itsMdFile = (filePath) => {
 	return path.extname(filePath) === ".md";
-},
+};
 
 //console.log(itsMdFile('./README.md'));
 
 //Leer archivo MD
-readMdFile : (filePath) => {
+const readMdFile = (filePath) => {
 	if (itsMdFile(filePath)) {
 		return readFilePromise(filePath);
 	}else {
 		return "";
 	}
-},
+};
 
-//console.log(readMdFile('./README.md'));
+//readMdFile('./README.md').then((x)=> {console.log(x)});
 
 //encontrar links con nombre
-findLinksData : (fileContent) => {
+const findLinksData = (fileContent) => {
 	let linkRegExp = /\[(.+)\]\((\S+)\)/gim; 
 	let matches = fileContent.matchAll(linkRegExp);
 	let links = Array.from(matches, match => { 
-	//	return {"name": match[1], "link": match[2]}
 		return match[2];
 	});
 	return links;
-},
-//console.log(findLinksData(readMdFile('./README.md')));
+};
+//findLinksData(readMdFile('./README.md')).then((x)=> {console.log(x)});
 
 
 // Caso 1 .- Ruta relativa sin options
-mdLinks : (filePath, options) => {
+/*const mdLinks = (filePath, options) => {
 	if (itsDirectory(filePath)) {
 		return readDirectory(filePath)
 		.then((filePath) => {
@@ -101,43 +98,28 @@ mdLinks : (filePath, options) => {
 				arrObj.push({"href" : url})
 			})
 			return arrObj;
-		})/*
-		.then 
-			if (options === true) {
-				fetch(url)
-		   		.then((res) => {
-		   			return res.status
-		   		})
-		   		.then((status) => {
-		   			return [url, status];
-		  	 	})
-		  	 	.then((arr) =>{
-		  	 		console.log(arr[0]+ " " + arr[1]);
-		  	 	})
-			}*/
-		};
-},
-//mdLinks('./README.md')
-//.then((links)=>{
-//	console.log(links);
-//});
+		})
+		.then((url) => {
+			fetch(url)
+			.then((res) => {
+				return res.status
+			})
+			.then((status) => {
+				return [url, status];
+			})
+			.then((arr) =>{
+				console.log(arr[0]+ " " + arr[1]);
+			});
+		});
+	};
+
+	mdLinks('./README.md')
+	.then((links)=>{
+		console.log(links);
+	});
+*/
 
 
-
-
-}
-/*links.forEach((url) => {
-	})
-fetch(url)
-   		.then((res) => {
-   			return res.status
-   		})
-   		.then((status) => {
-   			return [url, status];
-  	 	})
-  	 	.then((arr) =>{
-  	 		console.log(arr[0]+ " " + arr[1]);
-  	 	})*/
 /*
 mdLinks("./some/example.md")
   .then(links => {
@@ -163,21 +145,3 @@ mdLinks("./some/dir")
     console.log(links)
   })
   .catch(console.error); */
-/*Problema W: enseñar links validados
-Para resolver W necesito X: validar links
-Para resolver X necesito Y: encontrar links
-Para resolver Y necesito Z: leer un archivo md.
-Para resolver Z necesito A: filtrar archivos md.
-Para resolver A necesito B: leer directorio.
-Para resolver B necesito C: que sepa si es archivo o directorio.*/
-
-/*module.exports = (filePath) => {
-	if (path.extname(filePath) === ".md") {
-		return true;
-	}return false;
-};
-*/
-// return path.extname(filePath) === ".md" ? true : false;
-//module.exports =(filePath) => path.extname(filepath) === ".md" ? true : false;
-//module.exports = filePath => path.extname(filepath) === ".md" ? true : false;
-//module.exports = filePath => path.extname(filepath) === ".md";
