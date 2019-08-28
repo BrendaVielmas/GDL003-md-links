@@ -1,62 +1,110 @@
 const fs = require("fs");
-const fsPromises = require("fs").promises;
 const path = require("path");
 const fetch = require("node-fetch");
-const matchAll = require("match-all");
+//const matchAll = require("match-all");
 //Es directorio
 const itsDirectory = (filePath) => {
-	let resultOfDirectory = fs.lstatSync(filePath).isDirectory()
-	return resultOfDirectory;	
+	let directoryPromise = new Promise ((resolve, reject)=> {
+		fs.lstat(filePath, (err, stats)=> {
+			if (err) {
+				reject(err)
+				return 
+			}
+			resolve (stats.isDirectory())
+		})
+	})
+	return directoryPromise
 };
-
-//console.log(itsDirectory('./README.md'));
+//prueba
+itsDirectory("./README.md")
+	.then((isDirectory)=> {
+		if (isDirectory) {
+			console.log("ok")
+		} else {
+			console.log("not ok")
+		}
+	})
 
 //Es archivo
 const itsFile = (filePath) => {
-	let resultOfFile = fs.lstatSync(filePath).isFile()
+	return new Promise((resolve, reject) => {
+		fs.lstat(filePath, (err, stats) =>{
+			if (err) {
+				reject(err);
+				return
+			}
+			resolve(stats.isFile());
+		})
+	})
+	
 	return resultOfFile;
 };
-
-//console.log(itsFile('./README.md'));
+//prueba
+itsFile("./README.md")
+	.then((isFile) => {
+		if (isFile) {
+			console.log("it is")
+		} else {
+			console.log("its not")
+		}
+	})
 
 //Leer directorio
 const readDirectory = (filePath) => {
-	let listOfFiles = fs.readdirSync(filePath)
-	return listOfFiles;
+	return new Promise((resolve, reject) => {
+		fs.readdir(filePath, (err, files) => {
+			if (err) {
+				reject(err);
+				return
+			}
+			resolve(files);
+		})
+	})
 };
-
-//console.log(readDirectory('./'));
+//prueba
+readDirectory("./")
+	.then((files) => {
+			console.log(files)
+	})
 
 //Leer archivo
 const readFile = (filePath) => {
-	return fs.readFileSync(filePath).toString();
+	return new Promise ((resolve, reject) => {
+		fs.readFile(filePath, "utf8", (err, data) => {
+			if (err) {
+				reject(err);
+				return
+			}
+			resolve(data);
+		})
+	})
 };
-
-const readFilePromise = (filePath) => {
-	return fsPromises.readFile(filePath)
-	.then ((content) => {
-		return content.toString()
-	});
-};
-//console.log(readFilePromise('./README.md'));
+//prueba
+readFile("./README.md")
+	.then((data) => {
+		console.log(data)
+	})
 
 //Ver si es .md
 const itsMdFile = (filePath) => {
 	return path.extname(filePath) === ".md";
 };
-
+//prueba
 //console.log(itsMdFile('./README.md'));
 
 //Leer archivo MD
 const readMdFile = (filePath) => {
-	if (itsMdFile(filePath)) {
-		return readFilePromise(filePath);
-	}else {
-		return "";
-	}
+	return new Promise ((resolve, reject) => {
+		if (itsMdFile(filePath)) {
+			resolve(readFile(filePath));
+		}else {
+			resolve("");
+		}
+	})
 };
-
-//readMdFile('./README.md').then((x)=> {console.log(x)});
+//prueba
+readMdFile('./README.md')
+	.then((data) => {console.log(data)});
 
 //encontrar links con nombre
 const findLinksData = (fileContent) => {
@@ -67,26 +115,32 @@ const findLinksData = (fileContent) => {
 	});
 	return links;
 };
-//findLinksData(readMdFile('./README.md')).then((x)=> {console.log(x)});
+
+//prueba
+readMdFile('./README.md')
+.then((fileContent)=>{
+	console.log(findLinksData(fileContent))
+})
 
 
 // Caso 1 .- Ruta relativa sin options
 /*const mdLinks = (filePath, options) => {
 	if (itsDirectory(filePath)) {
-		return readDirectory(filePath)
-		.then((filePath) => {
-			return readMdFile(filePath)
-			.then((fileContent) => {
-				return findLinksData(fileContent)
+		let promise = readDirectory(filePath)
+			.then((files) => {
+				let promise = readMdFile(filePath)
+					.then((fileContent) => {
+						return findLinksData(fileContent)
+					})
+					.then((links) => {
+					let arrObj = [];
+					links.forEach((url) => {
+						arrObj.push({"href" : url})
+					})
+					return arrObj;	
+				})
 			})
-			.then((links) => {
-				let arrObj = [];
-			links.forEach((url) => {
-				arrObj.push({"href" : url})
-			})
-			return arrObj;
-			})
-		})
+		return promise
 	} else if (itsFile(filePath)) {
 		return readMdFile(filePath)
 		.then((fileContent) => {
