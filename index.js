@@ -16,14 +16,14 @@ const itsDirectory = (filePath) => {
 	return directoryPromise
 };
 //prueba
-itsDirectory("./README.md")
+/*itsDirectory("./README.md")
 	.then((isDirectory)=> {
 		if (isDirectory) {
 			console.log("ok")
 		} else {
 			console.log("not ok")
 		}
-	})
+	})*/
 
 //Es archivo
 const itsFile = (filePath) => {
@@ -40,14 +40,14 @@ const itsFile = (filePath) => {
 	return resultOfFile;
 };
 //prueba
-itsFile("./README.md")
+/*itsFile("./README.md")
 	.then((isFile) => {
 		if (isFile) {
 			console.log("it is")
 		} else {
 			console.log("its not")
 		}
-	})
+	})*/
 
 //Leer directorio
 const readDirectory = (filePath) => {
@@ -62,10 +62,10 @@ const readDirectory = (filePath) => {
 	})
 };
 //prueba
-readDirectory("./")
+/*readDirectory("./")
 	.then((files) => {
 			console.log(files)
-	})
+	})*/
 
 //Leer archivo
 const readFile = (filePath) => {
@@ -80,10 +80,10 @@ const readFile = (filePath) => {
 	})
 };
 //prueba
-readFile("./README.md")
+/*readFile("./README.md")
 	.then((data) => {
 		console.log(data)
-	})
+	})*/
 
 //Ver si es .md
 const itsMdFile = (filePath) => {
@@ -103,9 +103,9 @@ const readMdFile = (filePath) => {
 	})
 };
 //prueba
-readMdFile('./README.md')
+/*readMdFile('./README.md')
 	.then((data) => {console.log(data)});
-
+*/
 //encontrar links con nombre
 const findLinksData = (fileContent) => {
 	let linkRegExp = /\[(.+)\]\((\S+)\)/gim; 
@@ -117,10 +117,33 @@ const findLinksData = (fileContent) => {
 };
 
 //prueba
-readMdFile('./README.md')
+/*readMdFile('./README.md')
 .then((fileContent)=>{
 	console.log(findLinksData(fileContent))
-})
+})*/
+
+const statusOfLink = (links) => {
+	let arrObj = [];
+	links.forEach((url) => {
+		arrObj.push({"href" : url})
+	})
+	for  (let i = 0; i < arrObj.length; i++) {
+		fetch(arrObj[i].href).then((response) => {
+			let statusUnique =
+			let statusBroken =
+			let statusTotal = arrObj.length
+				console.log(arrObj[i].href+ ' status: '+ response.status)
+		});
+	}	
+};
+//prueba
+readMdFile('./README.md')
+.then((data) =>{
+ let links = findLinksData(data)
+statusOfLink(links)
+});
+
+
 
 
 // Caso 1 .- Ruta relativa sin options
@@ -166,13 +189,13 @@ readMdFile('./README.md')
 			});
 		});
 	};
-
+}
 	mdLinks('./README.md')
 	.then((links)=>{
 		console.log(links);
 	});
-*/
 
+*/
 
 /*
 mdLinks("./some/example.md")
