@@ -167,18 +167,18 @@ const statusOfLink = (links) => {
 				return {
 					"text" : links[i].text, 
 					"href" : links[i].href, 
-					"status" : response.status
+					"status" : response.status,
+					//"file" : path.basename(links)
 				}
 			});
 			arrPromise.push(promise)
 		}	
 		resolve (Promise.all(arrPromise))
 	})
-	
 };
 
 //prueba
-/*readMdFile('./README.md')
+readMdFile('./README.md')
 	.then((fileContent) =>{
 		let links = findLinksData(fileContent)
 		return statusOfLink(links)
@@ -186,8 +186,6 @@ const statusOfLink = (links) => {
 	.then((linksProperties) =>{
 		console.log(linksProperties)
 	})
-*/
-
 
 
 const mdLinks = (filePath, options) => {
@@ -222,7 +220,16 @@ const mdLinks = (filePath, options) => {
 }
 
 module.exports = {
-	itsDirectory: itsDirectory,
+	itsDirectory : itsDirectory,
+	itsFile : itsFile,
+	readDirectory : readDirectory,
+	readFile : readFile,
+	itsMdFile : itsMdFile,
+	readMdFile : readMdFile,
+	readMdFiles : readMdFiles,
+	findLinksData : findLinksData,
+	findLinksFiles : findLinksFiles,
+	statusOfLink : statusOfLink,
 	mdLinks: mdLinks
 }
 
