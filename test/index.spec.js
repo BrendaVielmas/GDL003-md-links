@@ -1,22 +1,19 @@
-require('../index.js');
+const index = require('../index.js');
 
-describe('index', () => {
 
-  it('debería ser un objeto', () => {
-    expect(typeof index).toEqual('object');
-  });
-});
-/*
 describe("itsDirectory", () => {
   it("is a function", () => {
-    expect(typeof itsDirectory).toBe("function");
+    expect(typeof index.itsDirectory).toBe("function");
   });
   it("it should be return if its directory or not", () => {
   	let filePath = "./README.md";
-    expect(itsDirectory(filePath)).toBe(false);
+    index.itsDirectory(filePath).then((isDirectory)=>{
+      expect (isDirectory).toBe(false)
+    });
   });
 });
 
+/*
 describe("itsFile", () => {
   it("is a function", () => {
     expect (typeof itsFile).toBe("function");
