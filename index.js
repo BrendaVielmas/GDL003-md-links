@@ -1,7 +1,10 @@
+#!/usr/bin/env node
+
 const fs = require("fs");
 const path = require("path");
 const fetch = require("node-fetch");
-//const matchAll = require("match-all");
+const [,, ...args] = process.argv
+
 //Es directorio
 const itsDirectory = (filePath) => {
 	let directoryPromise = new Promise ((resolve, reject)=> {
@@ -97,9 +100,11 @@ const itsMdFile = (filePath) => {
 const readMdFile = (filePath) => {
 	return new Promise ((resolve, reject) => {
 		if (itsMdFile(filePath)) {
-			resolve(readFile(filePath));
+			resolve(readFile(filePath).then((content)=> {
+				return {"content" : content , "file" : filePath}
+			}));
 		}else {
-			resolve("");
+			resolve({"content" : "", "file" : filePath});
 		}
 	})
 };
@@ -123,9 +128,9 @@ const readMdFiles = (filePaths) => {
 //encontrar links con nombre
 const findLinksData = (fileContent) => {
 	let linkRegExp = /\[(.+)\]\((\S+)\)/gim; 
-	let matches = fileContent.matchAll(linkRegExp);
+	let matches = fileContent.content.matchAll(linkRegExp);
 	let links = Array.from(matches, match => { 
-		return {"text": match[1], "href": match[2]};
+		return {"text": match[1], "href": match[2], "file" : fileContent.file};
 	});
 	return links;
 };
@@ -168,7 +173,7 @@ const statusOfLink = (links) => {
 					"text" : links[i].text, 
 					"href" : links[i].href, 
 					"status" : response.status,
-					//"file" : path.basename(links)
+					"file" : links[i].file
 				}
 			});
 			arrPromise.push(promise)
@@ -178,7 +183,7 @@ const statusOfLink = (links) => {
 };
 
 //prueba
-readMdFile('./README.md')
+/*readMdFile('./README.md')
 	.then((fileContent) =>{
 		let links = findLinksData(fileContent)
 		return statusOfLink(links)
@@ -186,7 +191,28 @@ readMdFile('./README.md')
 	.then((linksProperties) =>{
 		console.log(linksProperties)
 	})
+*/
+const onlyUnique = (value, index, self) => { 
+    return self.indexOf(value) === index;
+};
 
+const countLinks = (arrLinks, validate) => {
+	let arrHref = [];
+	let total = arrLinks.length;
+	let broken = 0
+	for (let i = 0; i < arrLinks.length; i++) {
+		arrHref.push(arrLinks[i].href)
+		if (arrLinks[i].status != 200) {
+			broken = broken + 1;
+		}
+	}
+	let unique = arrHref.filter(onlyUnique);
+	let acum = {"total" : total, "unique" : unique.length}
+	if (validate) {
+		acum.broken = broken
+	}
+	return acum
+}
 
 const mdLinks = (filePath, options) => {
 	return itsDirectory(filePath)
@@ -194,11 +220,21 @@ const mdLinks = (filePath, options) => {
 			if (responseYesOrNot === true) {
 				return readDirectory(filePath)
 					.then((files)=>{
+						for (let i = 0; i < files.length; i++) {
+							files[i] = filePath + "/" + files[i]
+						}
 						return readMdFiles(files)
 					})
 					.then((filesContent)=>{
 						return findLinksFiles(filesContent)
 					}) 
+					.then((links) => {
+						if (options && options.stats) {
+							return countLinks(links)
+						} else {
+							return links
+						}
+					})
 			}else {
 				return itsFile(filePath)
 					.then((responseYesOrNot)=>{
@@ -207,10 +243,20 @@ const mdLinks = (filePath, options) => {
 								.then((fileContent) =>{
 									if (options && options.validate === true) {
 										let links = findLinksData(fileContent)
-										return statusOfLink(links)
+										return statusOfLink(links).then((linksProperties) => {
+											if (options.stats === true) {
+												return countLinks(linksProperties, options.validate)
+											} else {
+												return linksProperties
+											}
+										})
 									} else {
 										let links = findLinksData(fileContent)
-										return links
+										if (options && options.stats) {
+											return countLinks(links, options.validate)
+										} else {
+											return links	
+										}
 									}
 								})
 						}
@@ -230,19 +276,37 @@ module.exports = {
 	findLinksData : findLinksData,
 	findLinksFiles : findLinksFiles,
 	statusOfLink : statusOfLink,
+	countLinks : countLinks,
 	mdLinks: mdLinks
 }
 
+if (args.length > 0 && args[0] != "--env=node"){
+	let stats = false
+	let validate = false
+	args.forEach((arg) => {
+		if (arg == "--stats") {
+			stats = true
+		}
+		if (arg == "--validate") {
+			validate = true
+		}
+	})
+	mdLinks(args[0], {stats: stats, validate: validate})
+		.then((links) => {
+			console.log(links)
+		})
+}
+
 // Caso 1 .- Ruta relativa sin options
-/*mdLinks("./README.md")
+/*mdLinks("./fixtures/README2.md")
   .then(links => {
     // => [{ href, text, file }]
     console.log("basico")
     console.log(links)
   })
-  .catch(console.error);*/
+  .catch(console.error);
  // Caso 2 .- Ruta relativa con option (validate)
-/*mdLinks("./README.md", { validate: true })
+mdLinks("./fixtures/README2.md", {validate: true})
   .then(links => {
     // => [{ href, text, file, status, ok }]
     console.log("validate true")
@@ -256,4 +320,21 @@ mdLinks("./")
     console.log("dir")
     console.log(links)
   })
-  .catch(console.error); */
+  .catch(console.error); 
+ //Caso 4 .- Ruta relativa con stats
+ mdLinks("./fixtures/README2.md", {stats: true})
+  .then(links => {
+    // => [{ href, text, file, status, ok }]
+    console.log("stats true")
+    console.log(links)
+  })
+  .catch(console.error);
+ //Caso 5 .- Ruta relativa con stats y validate
+ mdLinks("./fixtures/README2.md", {validate : true, stats: true})
+  .then(links => {
+    // => [{ href, text, file, status, ok }]
+    console.log("stats true")
+    console.log("validate true")
+    console.log(links)
+  })
+  .catch(console.error);*/

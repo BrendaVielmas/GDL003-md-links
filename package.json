@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "jest": "jest --env=node --colors --coverage test",
-    "test": "npm run jest"
+    "test": "npm run jest",
+    "md-links": "./index.js"
   },
   "dependencies": {
     "eslint": "^5.9.0",
@@ -14,5 +15,8 @@
     "jest": "^23.6.0",
     "match-all": "^1.2.5",
     "node-fetch": "^2.6.0"
+  },
+  "bin": {
+    "md-links": "./index.js"
   }
 }
