@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const fetch = require("node-fetch");
 const [,, ...args] = process.argv
-
+//console.log(process.argv);
 //Es directorio
 const itsDirectory = (filePath) => {
 	let directoryPromise = new Promise ((resolve, reject)=> {
@@ -129,7 +129,7 @@ const readMdFiles = (filePaths) => {
 const findLinksData = (fileContent) => {
 	let linkRegExp = /\[(.+)\]\((\S+)\)/gim; 
 	let matches = fileContent.content.matchAll(linkRegExp);
-	let links = Array.from(matches, match => { 
+	let links = Array.from(matches, (match) => { 
 		return {"text": match[1], "href": match[2], "file" : fileContent.file};
 	});
 	return links;
@@ -192,10 +192,6 @@ const statusOfLink = (links) => {
 		console.log(linksProperties)
 	})
 */
-const onlyUnique = (value, index, self) => { 
-    return self.indexOf(value) === index;
-};
-
 const countLinks = (arrLinks, validate) => {
 	let arrHref = [];
 	let total = arrLinks.length;
@@ -206,7 +202,10 @@ const countLinks = (arrLinks, validate) => {
 			broken = broken + 1;
 		}
 	}
-	let unique = arrHref.filter(onlyUnique);
+	// [2, 3,4, 2, 5,6].index-of(2)
+	let unique = arrHref.filter((value, index, self) => { 
+    	return self.indexOf(value) === index;
+	});
 	let acum = {"total" : total, "unique" : unique.length}
 	if (validate) {
 		acum.broken = broken
@@ -245,7 +244,7 @@ const mdLinks = (filePath, options) => {
 										let links = findLinksData(fileContent)
 										return statusOfLink(links).then((linksProperties) => {
 											if (options.stats === true) {
-												return countLinks(linksProperties, options.validate)
+												return countLinks(linksProperties, true)
 											} else {
 												return linksProperties
 											}
@@ -253,7 +252,7 @@ const mdLinks = (filePath, options) => {
 									} else {
 										let links = findLinksData(fileContent)
 										if (options && options.stats) {
-											return countLinks(links, options.validate)
+											return countLinks(links, false)
 										} else {
 											return links	
 										}
@@ -280,6 +279,8 @@ module.exports = {
 	mdLinks: mdLinks
 }
 
+// ./index.js "README.md" --validate --stats
+// node index.js "README.md"  --stats --validate
 if (args.length > 0 && args[0] != "--env=node"){
 	let stats = false
 	let validate = false

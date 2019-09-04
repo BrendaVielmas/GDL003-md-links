@@ -15,8 +15,5 @@
     "jest": "^23.6.0",
     "match-all": "^1.2.5",
     "node-fetch": "^2.6.0"
-  },
-  "bin": {
-    "md-links": "./index.js"
   }
 }
